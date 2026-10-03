@@ -1,24 +1,15 @@
 {
-  "name": "employee-task-management-system",
+  "name": "employee-task-management",
   "version": "1.0.0",
-  "description": "Employee Task Management System built with Pure Native Node.js (No Express framework), HTML, CSS, JS, and MySQL",
+  "description": "Simple Employee Task Management System using HTML, CSS, JS, Node.js Express, and MySQL",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js"
+    "start": "node server.js"
   },
-  "keywords": [
-    "employee",
-    "task-management",
-    "native-nodejs",
-    "http",
-    "mysql",
-    "crud"
-  ],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "mysql2": "^3.12.0"
   }
 }

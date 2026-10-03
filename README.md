@@ -1,135 +1,50 @@
-# Employee Task Management System
+# Employee Task Management System (Simple & Beginner Friendly)
 
-A clean, human-readable, full-stack web application designed for managing employee tasks, tracking progress, filtering, sorting, and monitoring dashboard statistics.
+A simple, easy-to-understand Employee Task Management System web application built with **HTML, CSS, JavaScript**, **Node.js + Express**, and **MySQL**.
 
-Built with **HTML, CSS, JavaScript** on the frontend, **Pure Native Node.js** (`http` module, **zero framework dependencies**) on the backend, and **MySQL** for persistent database storage.
-
----
-
-## 🌟 Key Features
-
-### Required Website Functionalities
-- 📊 **Dashboard Overview**: Live counter cards showing **Total Tasks**, **Pending Tasks**, **In Progress Tasks**, **Completed Tasks**, and **High Priority Tasks**.
-- ➕ **Add Task Form**: Modal dialog for creating tasks with Task Title, Description, Priority (Low, Medium, High), Status (Pending, In Progress, Completed), Assigned Employee, and Due Date.
-- 📋 **Table & Card Views**: Display tasks in a clear data table view or switch to a grid cards layout.
-- ✏️ **Edit Existing Tasks**: Modal form pre-populated with existing task details for updating.
-- 🗑️ **Delete Task**: Custom confirmation modal dialog preventing accidental deletion.
-- ⚡ **Quick Status Update**: Change task status directly from rows/cards dropdown menu.
-- 🔍 **Search Tasks**: Real-time live search by task title, description, or assigned employee name.
-- 🎯 **Multi-Criteria Filtering**: Filter tasks by Status and Priority simultaneously.
-- ✅ **Form Validation**: Client-side and server-side validation for mandatory fields (Title, Due Date, Assigned Employee, Status, Priority) and valid dates.
-- 💾 **Data Persistence**: Uses **MySQL** database with auto-initialization script (`schema.sql`).
-
-### Bonus Features Included
-- 🔐 **User Login / Logout**: Authentication session handling with login page (`login.html`).
-- 👥 **Task Assignment to Employees**: Dynamic assignee selection dropdown linked to employee database table (`employees`).
-- 📄 **Pagination**: Configurable items per page (5, 10, 20) with previous/next page navigation controls.
-- 🔀 **Sorting**: Sort tasks by Due Date, Priority, Title, or Date Created in Ascending or Descending order.
-- 📱 **Responsive Design**: Clean layout adaptable to desktop and mobile viewports.
+Designed with **ultra-simple code structure** so that any developer or interviewer can read, understand, and run the project in minutes!
 
 ---
 
-## 🛠️ Technology Stack
-
-- **Frontend**: Vanilla HTML5, CSS3, JavaScript (ES6+).
-- **Backend**: Pure Native Node.js (Built-in `http`, `fs`, `path`, `url` modules, no Express framework dependency).
-- **Database**: MySQL (`mysql2` library with promise support).
-- **Environment & Tools**: `dotenv`, `git`.
-
----
-
-## 📁 Project Structure
+## 📁 Simple Project Structure (Only 5 Main Files!)
 
 ```
 employee_management system/
-├── config/
-│   └── db.js                 # MySQL pool configuration & auto-initialization
+├── server.js             # Simple Node.js Express server & REST API (~100 lines)
+├── schema.sql            # Simple MySQL database script (employees & tasks tables)
+├── package.json          # Node dependencies (express, mysql2, dotenv, cors)
+├── .env                  # MySQL database configuration settings
 ├── public/
-│   ├── index.html            # Main single-page application dashboard
-│   ├── login.html            # Login page UI
-│   ├── css/
-│   │   └── style.css         # Clean CSS design system & layout
-│   └── js/
-│       ├── app.js            # Core frontend state management & API interaction
-│       ├── auth.js           # Authentication & header profile management
-│       └── validation.js     # Form validation helper functions
-├── routes/
-│   ├── authRoutes.js         # User login / logout REST endpoints
-│   ├── employeeRoutes.js     # Employee list REST endpoints
-│   └── taskRoutes.js         # Task CRUD, search, filter, sort, pagination REST endpoints
-├── .env.example              # Sample environment configuration
-├── .env                      # Local environment configuration
-├── package.json              # Node.js dependencies
-├── schema.sql                # MySQL database creation & seed data script
-├── server.js                 # Express server entry point
-└── README.md                 # Complete documentation
+│   ├── index.html        # Simple HTML page (Dashboard, Task Table & Modal)
+│   ├── style.css         # Simple CSS styling
+│   └── script.js         # Simple JavaScript DOM & Fetch API logic
+└── README.md             # Project documentation
 ```
 
 ---
 
-## 🚀 Quick Start Guide
+## 🌟 Key Functionalities Included
 
-### Prerequisites
-- [Node.js](https://nodejs.org/) (v18+ recommended)
-- [MySQL Server](https://www.mysql.com/) (Optional: if MySQL server is running locally on port 3306, it will automatically connect and create `employee_task_db`. If MySQL is not running, the application seamlessly runs in fallback mode).
+1. **Dashboard Overview**: Stat cards displaying **Total Tasks**, **Pending Tasks**, **In Progress Tasks**, and **Completed Tasks**.
+2. **Add Task Form**: Modal dialog with Task Title, Description, Priority (Low, Medium, High), Status, Assigned Employee, and Due Date.
+3. **Task Table View**: Display all tasks with employee name, priority badge, status badge, due date, Edit button, and Delete button.
+4. **Edit Task**: Pre-fills the modal form with existing task details for quick updating.
+5. **Delete Task**: Confirmation prompt before deleting a task.
+6. **Search & Filter**: Real-time search by task title and filtering by Status and Priority.
+7. **Form Validation**: Simple client and server validation for required fields.
+8. **MySQL Data Persistence**: Persistent storage with sample seed data.
 
-### Step 1: Install Dependencies
+---
+
+## 🚀 How to Run the Project
+
+### 1. Install Dependencies
 ```bash
 npm install
 ```
 
-### Step 2: Configure Environment Variables
-Copy `.env.example` to `.env`:
-```env
-PORT=3000
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=root
-DB_NAME=employee_task_db
-DB_PORT=3306
-```
-
-### Step 3: Database Setup (Automatic)
-The application automatically creates the `employee_task_db` database and initial seed data on startup. Alternatively, you can run `schema.sql` manually in MySQL Workbench or CLI:
-```bash
-mysql -u root -p < schema.sql
-```
-
-### Step 4: Run Application
+### 2. Run the Server
 ```bash
 npm start
 ```
-Open your browser and navigate to: **`http://localhost:3000`**
-
-### Demo Login Credentials
-- **Email**: `admin@company.com`
-- **Password**: `admin123`
-
----
-
-## 🔌 REST API Endpoints
-
-### Tasks API (`/api/tasks`)
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/tasks` | Get all tasks (Supports `search`, `status`, `priority`, `sortBy`, `sortOrder`, `page`, `limit`) |
-| `GET` | `/api/tasks/:id` | Get single task details by ID |
-| `POST` | `/api/tasks` | Create a new task (Validates mandatory fields) |
-| `PUT` | `/api/tasks/:id` | Update an existing task by ID |
-| `PATCH` | `/api/tasks/:id/status` | Quick update task status |
-| `DELETE` | `/api/tasks/:id` | Delete a task by ID |
-
-### Employees API (`/api/employees`)
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/employees` | Get list of all employees for task assignment |
-
-### Auth API (`/api/auth`)
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `POST` | `/api/auth/login` | User login |
-| `GET` | `/api/auth/user` | Get current active user session |
-| `POST` | `/api/auth/logout` | User logout |
+Open your browser at: **`http://localhost:3000`**
