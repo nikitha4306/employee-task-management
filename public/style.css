@@ -1,4 +1,3 @@
-/* Simple CSS Stylesheet for Employee Task Management */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -25,7 +24,6 @@ body {
     padding: 0 20px;
 }
 
-/* Stat Cards */
 .stats-row {
     display: flex;
     gap: 15px;
@@ -57,7 +55,6 @@ body {
     font-weight: bold;
 }
 
-/* Toolbar */
 .toolbar {
     display: flex;
     gap: 12px;
@@ -79,7 +76,6 @@ body {
     flex: 1;
 }
 
-/* Buttons */
 .btn {
     padding: 8px 16px;
     border: none;
@@ -94,7 +90,6 @@ body {
 .btn-edit { background: #f39c12; color: white; padding: 4px 8px; font-size: 12px; }
 .btn-delete { background: #e74c3c; color: white; padding: 4px 8px; font-size: 12px; }
 
-/* Table */
 .task-table {
     width: 100%;
     border-collapse: collapse;
@@ -115,7 +110,6 @@ body {
     color: #2c3e50;
 }
 
-/* Badges */
 .badge {
     padding: 4px 8px;
     border-radius: 12px;
@@ -131,7 +125,6 @@ body {
 .badge-progress { background: #e0f2fe; color: #075985; }
 .badge-completed { background: #dcfce7; color: #166534; }
 
-/* Modal Popup */
 .modal {
     display: none;
     position: fixed;

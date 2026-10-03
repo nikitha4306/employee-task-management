@@ -1,4 +1,3 @@
-// Simple Node.js Express Server for Employee Task Management
 const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
@@ -12,7 +11,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// MySQL Database Connection Pool
 const dbConfig = {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
@@ -24,7 +22,6 @@ const dbConfig = {
 let dbPool = null;
 let useFallbackData = false;
 
-// Sample Fallback Tasks (used if MySQL connection fails)
 let sampleEmployees = [
     { id: 1, name: 'Rahul Sharma', email: 'rahul@company.com' },
     { id: 2, name: 'Priya Patel', email: 'priya@company.com' },
@@ -39,21 +36,16 @@ let sampleTasks = [
     { id: 4, title: 'QA Testing', description: 'Run manual test cases for release.', priority: 'Medium', status: 'Pending', assigned_employee_id: 4, assigned_employee_name: 'Sneha Gupta', due_date: '2026-10-22' }
 ];
 
-// Initialize DB Connection
 async function connectDatabase() {
     try {
         dbPool = mysql.createPool(dbConfig);
         await dbPool.query('SELECT 1');
-        console.log('✅ Connected to MySQL Database successfully!');
         useFallbackData = false;
     } catch (err) {
-        console.warn('⚠️  MySQL connection failed:', err.message);
-        console.warn('⚡ Running in fallback mode with sample data.');
         useFallbackData = true;
     }
 }
 
-// 1. Get Employees List for dropdown
 app.get('/api/employees', async (req, res) => {
     if (useFallbackData) {
         return res.json(sampleEmployees);
@@ -66,7 +58,6 @@ app.get('/api/employees', async (req, res) => {
     }
 });
 
-// 2. Get All Tasks with Search, Filter & Stats
 app.get('/api/tasks', async (req, res) => {
     const search = (req.query.search || '').toLowerCase();
     const status = req.query.status || 'All';
@@ -88,7 +79,6 @@ app.get('/api/tasks', async (req, res) => {
     }
 
     try {
-        // Calculate Stats
         const [statRows] = await dbPool.query(`
             SELECT 
                 COUNT(*) as total,
@@ -98,7 +88,6 @@ app.get('/api/tasks', async (req, res) => {
             FROM tasks
         `);
 
-        // Fetch Tasks with WHERE filters
         let whereClauses = [];
         let params = [];
 
@@ -127,12 +116,10 @@ app.get('/api/tasks', async (req, res) => {
         const [rows] = await dbPool.query(sql, params);
         res.json({ tasks: rows, stats: statRows[0] });
     } catch (err) {
-        console.error(err);
         res.status(500).json({ error: 'Failed to fetch tasks' });
     }
 });
 
-// 3. Create New Task
 app.post('/api/tasks', async (req, res) => {
     const { title, description, priority, status, assigned_employee_id, due_date } = req.body;
 
@@ -165,7 +152,6 @@ app.post('/api/tasks', async (req, res) => {
     }
 });
 
-// 4. Update Task
 app.put('/api/tasks/:id', async (req, res) => {
     const taskId = req.params.id;
     const { title, description, priority, status, assigned_employee_id, due_date } = req.body;
@@ -187,7 +173,6 @@ app.put('/api/tasks/:id', async (req, res) => {
     }
 });
 
-// 5. Delete Task
 app.delete('/api/tasks/:id', async (req, res) => {
     const taskId = req.params.id;
 
@@ -204,8 +189,7 @@ app.delete('/api/tasks/:id', async (req, res) => {
     }
 });
 
-// Start Server
 app.listen(PORT, async () => {
     await connectDatabase();
-    console.log(`🚀 Simple Server running at http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });

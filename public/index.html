@@ -8,14 +8,12 @@
 </head>
 <body>
 
-    <!-- Header -->
     <header class="header">
         <h1>Employee Task Management System</h1>
     </header>
 
     <div class="container">
 
-        <!-- Dashboard Stat Cards -->
         <div class="stats-row">
             <div class="stat-card">
                 <h3>Total Tasks</h3>
@@ -35,7 +33,6 @@
             </div>
         </div>
 
-        <!-- Toolbar (Search, Filter, Add Button) -->
         <div class="toolbar">
             <input type="text" id="searchInput" placeholder="Search task by title..." onkeyup="loadTasks()">
             
@@ -56,7 +53,6 @@
             <button class="btn btn-add" onclick="openAddModal()">+ Add New Task</button>
         </div>
 
-        <!-- Tasks Table -->
         <table class="task-table">
             <thead>
                 <tr>
@@ -69,13 +65,11 @@
                 </tr>
             </thead>
             <tbody id="taskTableBody">
-                <!-- Rows will load here -->
             </tbody>
         </table>
 
     </div>
 
-    <!-- Add / Edit Task Modal -->
     <div id="taskModal" class="modal">
         <div class="modal-content">
             <h2 id="modalTitle">Add Task</h2>

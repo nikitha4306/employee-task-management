@@ -1,15 +1,11 @@
-// Simple JavaScript Logic for Employee Task Management System
-
 const API_URL = '/api';
 let allTasks = [];
 
-// Run when page loads
 document.addEventListener('DOMContentLoaded', () => {
     loadEmployees();
     loadTasks();
 });
 
-// 1. Load Employees for Dropdown
 async function loadEmployees() {
     try {
         const response = await fetch(`${API_URL}/employees`);
@@ -26,7 +22,6 @@ async function loadEmployees() {
     }
 }
 
-// 2. Load Tasks and Stats
 async function loadTasks() {
     const search = document.getElementById('searchInput').value;
     const status = document.getElementById('statusFilter').value;
@@ -40,20 +35,17 @@ async function loadTasks() {
 
         allTasks = data.tasks || [];
 
-        // Update Dashboard Stats
         document.getElementById('statTotal').innerText = data.stats.total || 0;
         document.getElementById('statPending').innerText = data.stats.pending || 0;
         document.getElementById('statInProgress').innerText = data.stats.inProgress || 0;
         document.getElementById('statCompleted').innerText = data.stats.completed || 0;
 
-        // Render Table Rows
         renderTable(allTasks);
     } catch (err) {
         console.error('Failed to load tasks:', err);
     }
 }
 
-// 3. Render Tasks in HTML Table
 function renderTable(tasks) {
     const tableBody = document.getElementById('taskTableBody');
     tableBody.innerHTML = '';
@@ -86,7 +78,6 @@ function renderTable(tasks) {
     });
 }
 
-// 4. Open Add Modal
 function openAddModal() {
     document.getElementById('modalTitle').innerText = 'Add New Task';
     document.getElementById('taskId').value = '';
@@ -101,7 +92,6 @@ function openAddModal() {
     document.getElementById('taskModal').style.display = 'flex';
 }
 
-// 5. Open Edit Modal
 function openEditModal(taskId) {
     const task = allTasks.find(t => t.id == taskId);
     if (!task) return;
@@ -119,12 +109,10 @@ function openEditModal(taskId) {
     document.getElementById('taskModal').style.display = 'flex';
 }
 
-// 6. Close Modal
 function closeModal() {
     document.getElementById('taskModal').style.display = 'none';
 }
 
-// 7. Save Task (Add or Edit)
 async function saveTask() {
     const id = document.getElementById('taskId').value;
     const title = document.getElementById('taskTitle').value.trim();
@@ -136,7 +124,6 @@ async function saveTask() {
 
     const errorDiv = document.getElementById('formError');
 
-    // Validation
     if (!title || !due_date || !assigned_employee_id) {
         errorDiv.innerText = 'Please fill out all required fields (*).';
         errorDiv.style.display = 'block';
@@ -167,7 +154,6 @@ async function saveTask() {
     }
 }
 
-// 8. Delete Task
 async function deleteTask(taskId) {
     if (!confirm('Are you sure you want to delete this task?')) return;
 
@@ -181,7 +167,6 @@ async function deleteTask(taskId) {
     }
 }
 
-// Helper Functions
 function formatDate(dateStr) {
     if (!dateStr) return '';
     return dateStr.split('T')[0];
