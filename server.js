@@ -21,22 +21,7 @@ const dbConfig = {
 
 let dbPool = null;
 let useFallbackData = false;
-
-let sampleEmployees = [
-    { id: 1, name: 'Rahul Sharma', email: 'rahul@company.com' },
-    { id: 2, name: 'Priya Patel', email: 'priya@company.com' },
-    { id: 3, name: 'Amit Verma', email: 'amit@company.com' },
-    { id: 4, name: 'Sneha Gupta', email: 'sneha@company.com' },
-    { id: 5, name: 'Vikram Malhotra', email: 'vikram@company.com' }
-];
-
-let sampleTasks = [
-    { id: 1, title: 'Redesign Mobile App Onboarding Flow', description: 'Improve user retention by simplifying the signup screen and adding interactive feature tooltips.', priority: 'High', status: 'In Progress', assigned_employee_id: 2, assigned_employee_name: 'Priya Patel', due_date: '2026-10-15' },
-    { id: 2, title: 'Optimize Database Indexing for Order Queries', description: 'Add composite indexes on customer order tables to reduce query latency during peak traffic hours.', priority: 'High', status: 'Pending', assigned_employee_id: 3, assigned_employee_name: 'Amit Verma', due_date: '2026-10-18' },
-    { id: 3, title: 'Prepare Q4 Marketing Campaign Plan', description: 'Draft target audience persona sheets, social media schedule, and budget breakdown for Q4 product launch.', priority: 'Medium', status: 'Pending', assigned_employee_id: 5, assigned_employee_name: 'Vikram Malhotra', due_date: '2026-10-25' },
-    { id: 4, title: 'Execute Regression Test Suite for v2.4 Release', description: 'Perform manual end-to-end testing on checkout workflow, payment gateway integration, and email triggers.', priority: 'Medium', status: 'In Progress', assigned_employee_id: 4, assigned_employee_name: 'Sneha Gupta', due_date: '2026-10-12' },
-    { id: 5, title: 'Update Security Certificates & SSL Config', description: 'Renew production domain SSL certificates and update server security protocols before expiry.', priority: 'Low', status: 'Completed', assigned_employee_id: 1, assigned_employee_name: 'Rahul Sharma', due_date: '2026-10-05' }
-];
+let sampleTasks = [];
 
 async function connectDatabase() {
     try {
@@ -52,74 +37,23 @@ async function connectDatabase() {
         dbPool = mysql.createPool(dbConfig);
 
         await dbPool.query(`
-            CREATE TABLE IF NOT EXISTS employees (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(100) NOT NULL,
-                email VARCHAR(100) NOT NULL,
-                department VARCHAR(100) NOT NULL
-            );
-        `);
-
-        await dbPool.query(`
             CREATE TABLE IF NOT EXISTS tasks (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 title VARCHAR(200) NOT NULL,
                 description TEXT,
                 priority ENUM('Low', 'Medium', 'High') DEFAULT 'Medium',
                 status ENUM('Pending', 'In Progress', 'Completed') DEFAULT 'Pending',
-                assigned_employee_id INT,
                 due_date DATE NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (assigned_employee_id) REFERENCES employees(id) ON DELETE SET NULL
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
 
-        const [empRows] = await dbPool.query('SELECT COUNT(*) as count FROM employees');
-        if (empRows[0].count === 0) {
-            await dbPool.query(`
-                INSERT INTO employees (id, name, email, department) VALUES
-                (1, 'Rahul Sharma', 'rahul@company.com', 'Engineering'),
-                (2, 'Priya Patel', 'priya@company.com', 'Design'),
-                (3, 'Amit Verma', 'amit@company.com', 'Backend'),
-                (4, 'Sneha Gupta', 'sneha@company.com', 'Testing'),
-                (5, 'Vikram Malhotra', 'vikram@company.com', 'Marketing');
-            `);
-        }
-
-        const [taskRows] = await dbPool.query('SELECT COUNT(*) as count FROM tasks');
-        if (taskRows[0].count === 0) {
-            await dbPool.query(`
-                INSERT INTO tasks (id, title, description, priority, status, assigned_employee_id, due_date) VALUES
-                (1, 'Redesign Mobile App Onboarding Flow', 'Improve user retention by simplifying the signup screen and adding interactive feature tooltips.', 'High', 'In Progress', 2, '2026-10-15'),
-                (2, 'Optimize Database Indexing for Order Queries', 'Add composite indexes on customer order tables to reduce query latency during peak traffic hours.', 'High', 'Pending', 3, '2026-10-18'),
-                (3, 'Prepare Q4 Marketing Campaign Plan', 'Draft target audience persona sheets, social media schedule, and budget breakdown for Q4 product launch.', 'Medium', 'Pending', 5, '2026-10-25'),
-                (4, 'Execute Regression Test Suite for v2.4 Release', 'Perform manual end-to-end testing on checkout workflow, payment gateway integration, and email triggers.', 'Medium', 'In Progress', 4, '2026-10-12'),
-                (5, 'Update Security Certificates & SSL Config', 'Renew production domain SSL certificates and update server security protocols before expiry.', 'Low', 'Completed', 1, '2026-10-05');
-            `);
-        }
-
         useFallbackData = false;
-        console.log('✅ MySQL Database connected & initialized!');
+        console.log('✅ Database connected');
     } catch (err) {
-        console.log('⚡ Running in fallback mode with sample data.');
         useFallbackData = true;
     }
 }
-
-app.get('/api/employees', async (req, res) => {
-    if (useFallbackData) {
-        return res.json(sampleEmployees);
-    }
-    try {
-        const [rows] = await dbPool.query('SELECT id, name FROM employees ORDER BY name ASC');
-        if (!rows || rows.length === 0) {
-            return res.json(sampleEmployees);
-        }
-        res.json(rows);
-    } catch (err) {
-        res.json(sampleEmployees);
-    }
-});
 
 app.get('/api/tasks', async (req, res) => {
     const search = (req.query.search || '').toLowerCase();
@@ -155,51 +89,42 @@ app.get('/api/tasks', async (req, res) => {
         let params = [];
 
         if (search) {
-            whereClauses.push('LOWER(t.title) LIKE ?');
+            whereClauses.push('LOWER(title) LIKE ?');
             params.push(`%${search}%`);
         }
         if (status !== 'All') {
-            whereClauses.push('t.status = ?');
+            whereClauses.push('status = ?');
             params.push(status);
         }
         if (priority !== 'All') {
-            whereClauses.push('t.priority = ?');
+            whereClauses.push('priority = ?');
             params.push(priority);
         }
 
         const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
-        const sql = `
-            SELECT t.*, e.name as assigned_employee_name 
-            FROM tasks t 
-            LEFT JOIN employees e ON t.assigned_employee_id = e.id 
-            ${whereSql} 
-            ORDER BY t.due_date ASC
-        `;
+        const sql = `SELECT * FROM tasks ${whereSql} ORDER BY due_date ASC`;
 
         const [rows] = await dbPool.query(sql, params);
-        res.json({ tasks: rows, stats: statRows[0] });
+        res.json({ tasks: rows, stats: statRows[0] || { total: 0, pending: 0, inProgress: 0, completed: 0 } });
     } catch (err) {
         res.status(500).json({ error: 'Failed to fetch tasks' });
     }
 });
 
 app.post('/api/tasks', async (req, res) => {
-    const { title, description, priority, status, assigned_employee_id, due_date } = req.body;
+    const { title, description, priority, status, due_date } = req.body;
 
-    if (!title || !due_date || !assigned_employee_id) {
-        return res.status(400).json({ error: 'Title, Due Date, and Employee are required fields.' });
+    if (!title || !due_date) {
+        return res.status(400).json({ error: 'Title and Due Date are required fields.' });
     }
 
     if (useFallbackData) {
-        const emp = sampleEmployees.find(e => e.id == assigned_employee_id);
         const newTask = {
-            id: sampleTasks.length + 1,
+            id: sampleTasks.length > 0 ? Math.max(...sampleTasks.map(t => t.id)) + 1 : 1,
             title,
             description,
-            priority,
-            status,
-            assigned_employee_id: Number(assigned_employee_id),
-            assigned_employee_name: emp ? emp.name : 'Unassigned',
+            priority: priority || 'Medium',
+            status: status || 'Pending',
             due_date
         };
         sampleTasks.push(newTask);
@@ -207,8 +132,8 @@ app.post('/api/tasks', async (req, res) => {
     }
 
     try {
-        const sql = 'INSERT INTO tasks (title, description, priority, status, assigned_employee_id, due_date) VALUES (?, ?, ?, ?, ?, ?)';
-        const [result] = await dbPool.query(sql, [title, description, priority, status, assigned_employee_id, due_date]);
+        const sql = 'INSERT INTO tasks (title, description, priority, status, due_date) VALUES (?, ?, ?, ?, ?)';
+        const [result] = await dbPool.query(sql, [title, description, priority || 'Medium', status || 'Pending', due_date]);
         res.status(201).json({ message: 'Task created successfully', id: result.insertId });
     } catch (err) {
         res.status(500).json({ error: 'Failed to create task' });
@@ -217,19 +142,22 @@ app.post('/api/tasks', async (req, res) => {
 
 app.put('/api/tasks/:id', async (req, res) => {
     const taskId = req.params.id;
-    const { title, description, priority, status, assigned_employee_id, due_date } = req.body;
+    const { title, description, priority, status, due_date } = req.body;
+
+    if (!title || !due_date) {
+        return res.status(400).json({ error: 'Title and Due Date are required fields.' });
+    }
 
     if (useFallbackData) {
         const index = sampleTasks.findIndex(t => t.id == taskId);
         if (index === -1) return res.status(404).json({ error: 'Task not found' });
-        const emp = sampleEmployees.find(e => e.id == assigned_employee_id);
-        sampleTasks[index] = { ...sampleTasks[index], title, description, priority, status, assigned_employee_id: Number(assigned_employee_id), assigned_employee_name: emp ? emp.name : 'Unassigned', due_date };
+        sampleTasks[index] = { ...sampleTasks[index], title, description, priority, status, due_date };
         return res.json({ message: 'Task updated successfully' });
     }
 
     try {
-        const sql = 'UPDATE tasks SET title=?, description=?, priority=?, status=?, assigned_employee_id=?, due_date=? WHERE id=?';
-        await dbPool.query(sql, [title, description, priority, status, assigned_employee_id, due_date, taskId]);
+        const sql = 'UPDATE tasks SET title=?, description=?, priority=?, status=?, due_date=? WHERE id=?';
+        await dbPool.query(sql, [title, description, priority, status, due_date, taskId]);
         res.json({ message: 'Task updated successfully' });
     } catch (err) {
         res.status(500).json({ error: 'Failed to update task' });

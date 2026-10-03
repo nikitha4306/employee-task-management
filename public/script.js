@@ -2,39 +2,8 @@ const API_URL = '/api';
 let allTasks = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadEmployees();
     loadTasks();
 });
-
-async function loadEmployees() {
-    const select = document.getElementById('taskEmployee');
-    const defaultEmployees = [
-        { id: 1, name: 'Rahul Sharma' },
-        { id: 2, name: 'Priya Patel' },
-        { id: 3, name: 'Amit Verma' },
-        { id: 4, name: 'Sneha Gupta' },
-        { id: 5, name: 'Vikram Malhotra' }
-    ];
-
-    try {
-        const response = await fetch(`${API_URL}/employees`);
-        let employees = await response.json();
-        
-        if (!Array.isArray(employees) || employees.length === 0) {
-            employees = defaultEmployees;
-        }
-
-        select.innerHTML = '<option value="">-- Select Employee --</option>';
-        employees.forEach(emp => {
-            select.innerHTML += `<option value="${emp.id}">${emp.name}</option>`;
-        });
-    } catch (err) {
-        select.innerHTML = '<option value="">-- Select Employee --</option>';
-        defaultEmployees.forEach(emp => {
-            select.innerHTML += `<option value="${emp.id}">${emp.name}</option>`;
-        });
-    }
-}
 
 async function loadTasks() {
     const search = document.getElementById('searchInput').value;
@@ -65,7 +34,7 @@ function renderTable(tasks) {
     tableBody.innerHTML = '';
 
     if (tasks.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No tasks found.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No tasks found.</td></tr>';
         return;
     }
 
@@ -79,7 +48,6 @@ function renderTable(tasks) {
                 <strong>${escapeHtml(task.title)}</strong>
                 <br><small style="color: #666;">${escapeHtml(task.description || '')}</small>
             </td>
-            <td>${escapeHtml(task.assigned_employee_name || 'Unassigned')}</td>
             <td><span class="badge ${priorityBadge}">${task.priority}</span></td>
             <td><span class="badge ${statusBadge}">${task.status}</span></td>
             <td>${formatDate(task.due_date)}</td>
@@ -99,7 +67,6 @@ function openAddModal() {
     document.getElementById('taskDescription').value = '';
     document.getElementById('taskPriority').value = 'Medium';
     document.getElementById('taskStatus').value = 'Pending';
-    document.getElementById('taskEmployee').value = '';
     document.getElementById('taskDueDate').value = '';
     document.getElementById('formError').style.display = 'none';
 
@@ -116,7 +83,6 @@ function openEditModal(taskId) {
     document.getElementById('taskDescription').value = task.description || '';
     document.getElementById('taskPriority').value = task.priority;
     document.getElementById('taskStatus').value = task.status;
-    document.getElementById('taskEmployee').value = task.assigned_employee_id || '';
     document.getElementById('taskDueDate').value = formatDate(task.due_date);
     document.getElementById('formError').style.display = 'none';
 
@@ -133,18 +99,17 @@ async function saveTask() {
     const description = document.getElementById('taskDescription').value.trim();
     const priority = document.getElementById('taskPriority').value;
     const status = document.getElementById('taskStatus').value;
-    const assigned_employee_id = document.getElementById('taskEmployee').value;
     const due_date = document.getElementById('taskDueDate').value;
 
     const errorDiv = document.getElementById('formError');
 
-    if (!title || !due_date || !assigned_employee_id) {
-        errorDiv.innerText = 'Please fill out all required fields (*).';
+    if (!title || !due_date) {
+        errorDiv.innerText = 'Please fill out Task Title and Due Date.';
         errorDiv.style.display = 'block';
         return;
     }
 
-    const payload = { title, description, priority, status, assigned_employee_id, due_date };
+    const payload = { title, description, priority, status, due_date };
     const method = id ? 'PUT' : 'POST';
     const url = id ? `${API_URL}/tasks/${id}` : `${API_URL}/tasks`;
 
