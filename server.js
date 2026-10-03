@@ -26,14 +26,16 @@ let sampleEmployees = [
     { id: 1, name: 'Rahul Sharma', email: 'rahul@company.com' },
     { id: 2, name: 'Priya Patel', email: 'priya@company.com' },
     { id: 3, name: 'Amit Verma', email: 'amit@company.com' },
-    { id: 4, name: 'Sneha Gupta', email: 'sneha@company.com' }
+    { id: 4, name: 'Sneha Gupta', email: 'sneha@company.com' },
+    { id: 5, name: 'Vikram Malhotra', email: 'vikram@company.com' }
 ];
 
 let sampleTasks = [
-    { id: 1, title: 'Design UI Mockups', description: 'Create simple wireframes for company portal.', priority: 'High', status: 'In Progress', assigned_employee_id: 2, assigned_employee_name: 'Priya Patel', due_date: '2026-10-15' },
-    { id: 2, title: 'Fix Login API Bug', description: 'Resolve password authentication issue.', priority: 'High', status: 'Pending', assigned_employee_id: 3, assigned_employee_name: 'Amit Verma', due_date: '2026-10-18' },
-    { id: 3, title: 'Write User Manual', description: 'Document system features for end users.', priority: 'Low', status: 'Completed', assigned_employee_id: 1, assigned_employee_name: 'Rahul Sharma', due_date: '2026-10-05' },
-    { id: 4, title: 'QA Testing', description: 'Run manual test cases for release.', priority: 'Medium', status: 'Pending', assigned_employee_id: 4, assigned_employee_name: 'Sneha Gupta', due_date: '2026-10-22' }
+    { id: 1, title: 'Redesign Mobile App Onboarding Flow', description: 'Improve user retention by simplifying the signup screen and adding interactive feature tooltips.', priority: 'High', status: 'In Progress', assigned_employee_id: 2, assigned_employee_name: 'Priya Patel', due_date: '2026-10-15' },
+    { id: 2, title: 'Optimize Database Indexing for Order Queries', description: 'Add composite indexes on customer order tables to reduce query latency during peak traffic hours.', priority: 'High', status: 'Pending', assigned_employee_id: 3, assigned_employee_name: 'Amit Verma', due_date: '2026-10-18' },
+    { id: 3, title: 'Prepare Q4 Marketing Campaign Plan', description: 'Draft target audience persona sheets, social media schedule, and budget breakdown for Q4 product launch.', priority: 'Medium', status: 'Pending', assigned_employee_id: 5, assigned_employee_name: 'Vikram Malhotra', due_date: '2026-10-25' },
+    { id: 4, title: 'Execute Regression Test Suite for v2.4 Release', description: 'Perform manual end-to-end testing on checkout workflow, payment gateway integration, and email triggers.', priority: 'Medium', status: 'In Progress', assigned_employee_id: 4, assigned_employee_name: 'Sneha Gupta', due_date: '2026-10-12' },
+    { id: 5, title: 'Update Security Certificates & SSL Config', description: 'Renew production domain SSL certificates and update server security protocols before expiry.', priority: 'Low', status: 'Completed', assigned_employee_id: 1, assigned_employee_name: 'Rahul Sharma', due_date: '2026-10-05' }
 ];
 
 async function connectDatabase() {
