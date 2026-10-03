@@ -2,7 +2,7 @@
 
 A clean, human-readable, full-stack web application designed for managing employee tasks, tracking progress, filtering, sorting, and monitoring dashboard statistics.
 
-Built with **HTML, CSS, JavaScript** on the frontend, **Node.js & Express** on the backend, and **MySQL** for persistent database storage.
+Built with **HTML, CSS, JavaScript** on the frontend, **Pure Native Node.js** (`http` module, **zero framework dependencies**) on the backend, and **MySQL** for persistent database storage.
 
 ---
 
@@ -32,9 +32,9 @@ Built with **HTML, CSS, JavaScript** on the frontend, **Node.js & Express** on t
 ## 🛠️ Technology Stack
 
 - **Frontend**: Vanilla HTML5, CSS3, JavaScript (ES6+).
-- **Backend**: Node.js, Express.js.
+- **Backend**: Pure Native Node.js (Built-in `http`, `fs`, `path`, `url` modules, no Express framework dependency).
 - **Database**: MySQL (`mysql2` library with promise support).
-- **Environment & Tools**: `dotenv`, `cors`, `git`.
+- **Environment & Tools**: `dotenv`, `git`.
 
 ---
 
