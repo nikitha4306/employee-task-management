@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Task Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <header class="navbar">
+        <div class="brand">
+            <div class="brand-icon">ET</div>
+            <h1>Employee Task Management System</h1>
+        </div>
+        <div class="user-profile">
+            <div class="user-info">
+                Logged in as: <span id="headerUserName" class="user-name">Admin Manager</span>
+                <span id="headerUserRole" style="font-size: 0.8rem; color: #64748b;">(Manager)</span>
+            </div>
+            <button id="btnLogout" class="btn-logout">Logout</button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="container">
+
+        <!-- 1. Dashboard Overview Stats Cards -->
+        <section class="stats-grid">
+            <div class="stat-card stat-total">
+                <div>
+                    <h3>Total Tasks</h3>
+                    <div id="statTotalTasks" class="stat-value">0</div>
+                </div>
+                <div class="stat-icon">📋</div>
+            </div>
+
+            <div class="stat-card stat-pending">
+                <div>
+                    <h3>Pending</h3>
+                    <div id="statPendingTasks" class="stat-value">0</div>
+                </div>
+                <div class="stat-icon">⏳</div>
+            </div>
+
+            <div class="stat-card stat-progress">
+                <div>
+                    <h3>In Progress</h3>
+                    <div id="statInProgressTasks" class="stat-value">0</div>
+                </div>
+                <div class="stat-icon">⚙️</div>
+            </div>
+
+            <div class="stat-card stat-completed">
+                <div>
+                    <h3>Completed</h3>
+                    <div id="statCompletedTasks" class="stat-value">0</div>
+                </div>
+                <div class="stat-icon">✅</div>
+            </div>
+
+            <div class="stat-card stat-high">
+                <div>
+                    <h3>High Priority</h3>
+                    <div id="statHighPriorityTasks" class="stat-value">0</div>
+                </div>
+                <div class="stat-icon">🔥</div>
+            </div>
+        </section>
+
+        <!-- 2. Controls Toolbar (Search, Filter, Sort, Add Task) -->
+        <section class="toolbar-card">
+            <!-- Search Box -->
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search tasks by title, description, or employee...">
+            </div>
+
+            <!-- Filters Group -->
+            <div class="filter-group">
+                <!-- Status Filter -->
+                <select id="statusFilter" class="filter-select">
+                    <option value="All">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select>
+
+                <!-- Priority Filter -->
+                <select id="priorityFilter" class="filter-select">
+                    <option value="All">All Priorities</option>
+                    <option value="High">High Priority</option>
+                    <option value="Medium">Medium Priority</option>
+                    <option value="Low">Low Priority</option>
+                </select>
+
+                <!-- Sorting -->
+                <select id="sortBySelect" class="filter-select">
+                    <option value="due_date">Sort by: Due Date</option>
+                    <option value="priority">Sort by: Priority</option>
+                    <option value="title">Sort by: Title</option>
+                    <option value="created_at">Sort by: Date Created</option>
+                </select>
+
+                <button id="btnSortOrderToggle" class="btn-secondary" title="Toggle Ascending/Descending">
+                    <span id="sortOrderLabel">Due Date ↑</span>
+                </button>
+            </div>
+
+            <!-- View Toggle and Add Task Button -->
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <div class="view-toggle">
+                    <button id="btnTableView" class="view-btn active" title="Table View">📊 Table</button>
+                    <button id="btnGridView" class="view-btn" title="Card View">🎴 Cards</button>
+                </div>
+
+                <button id="btnOpenAddTaskModal" class="btn-primary">
+                    <span>+ Add Task</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 3. Tasks Table & Grid Container -->
+        <section>
+            <!-- Table View Mode -->
+            <div id="tableViewWrapper" class="table-container">
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th>Task Title & Description</th>
+                            <th>Assigned Employee</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Due Date</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tasksTableBody">
+                        <!-- Populated dynamically via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Grid Cards View Mode (Hidden by default) -->
+            <div id="gridViewWrapper" class="grid-container" style="display: none;">
+                <!-- Populated dynamically via JS -->
+            </div>
+
+            <!-- Empty State Message -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div class="empty-state-icon">📂</div>
+                <h3>No Tasks Found</h3>
+                <p>No employee tasks match your search or filter criteria.</p>
+            </div>
+        </section>
+
+        <!-- 4. Pagination Footer -->
+        <section class="pagination-bar">
+            <div id="paginationInfo" class="pagination-info">
+                Showing 0 tasks
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="font-size: 0.85rem; color: #64748b;">
+                    Show per page:
+                    <select id="itemsPerPageSelect" class="filter-select" style="padding: 4px 8px;">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+
+                <div class="pagination-controls">
+                    <button id="btnPrevPage" class="page-btn" disabled>← Prev</button>
+                    <span id="pageNumbersContainer" style="display: flex; gap: 4px;"></span>
+                    <button id="btnNextPage" class="page-btn" disabled>Next →</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal 1: Create / Edit Task Modal -->
+    <div id="taskModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Employee Task</h2>
+                <button class="btn-close" id="btnCloseTaskModal">&times;</button>
+            </div>
+            
+            <form id="taskForm">
+                <div class="modal-body">
+                    <input type="hidden" id="taskId" name="taskId" value="">
+
+                    <!-- Task Title -->
+                    <div class="form-group">
+                        <label for="title">Task Title <span class="required">*</span></label>
+                        <input type="text" id="title" name="title" class="form-control" placeholder="e.g. Implement API Endpoint" required>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" class="form-control" rows="3" placeholder="Provide detailed instructions or goal..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <!-- Priority -->
+                        <div class="form-group">
+                            <label for="priority">Priority <span class="required">*</span></label>
+                            <select id="priority" name="priority" class="form-control" required>
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="form-group">
+                            <label for="status">Status <span class="required">*</span></label>
+                            <select id="status" name="status" class="form-control" required>
+                                <option value="Pending" selected>Pending</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <!-- Assigned Employee -->
+                        <div class="form-group">
+                            <label for="assignedEmployeeId">Assigned Employee <span class="required">*</span></label>
+                            <select id="assignedEmployeeId" name="assignedEmployeeId" class="form-control" required>
+                                <option value="">Loading employees...</option>
+                            </select>
+                        </div>
+
+                        <!-- Due Date -->
+                        <div class="form-group">
+                            <label for="dueDate">Due Date <span class="required">*</span></label>
+                            <input type="date" id="dueDate" name="dueDate" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="btnCancelTaskModal" class="btn-secondary">Cancel</button>
+                    <button type="submit" id="btnSaveTask" class="btn-primary">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 2: Delete Task Confirmation Modal -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 440px;">
+            <div class="modal-header" style="background: #fef2f2;">
+                <h2 style="color: #dc2626;">Confirm Task Deletion</h2>
+                <button class="btn-close" id="btnCloseDeleteModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.95rem; color: #334155;">
+                    Are you sure you want to delete the task <strong id="deleteTaskTitle">"Task Title"</strong>?
+                </p>
+                <p style="font-size: 0.85rem; color: #64748b; margin-top: 8px;">
+                    This action is permanent and cannot be undone.
+                </p>
+                <input type="hidden" id="deleteTaskId" value="">
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnCancelDelete" class="btn-secondary">Cancel</button>
+                <button type="button" id="btnConfirmDelete" class="btn-danger">Delete Task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- JavaScript Application Modules -->
+    <script src="js/validation.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>
