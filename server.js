@@ -36,8 +36,10 @@ async function connectDatabase() {
 
         dbPool = mysql.createPool(dbConfig);
 
+        await dbPool.query(`DROP TABLE IF EXISTS tasks;`);
+
         await dbPool.query(`
-            CREATE TABLE IF NOT EXISTS tasks (
+            CREATE TABLE tasks (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 title VARCHAR(200) NOT NULL,
                 description TEXT,
@@ -49,9 +51,10 @@ async function connectDatabase() {
         `);
 
         useFallbackData = false;
-        console.log('✅ Database connected');
+        console.log('✅ MySQL Database connected & cleaned (0 tasks)');
     } catch (err) {
         useFallbackData = true;
+        sampleTasks = [];
     }
 }
 
