@@ -189,7 +189,17 @@ app.delete('/api/tasks/:id', async (req, res) => {
     }
 });
 
-app.listen(PORT, async () => {
+const server = app.listen(PORT, async () => {
     await connectDatabase();
     console.log(`Server running on http://localhost:${PORT}`);
+});
+
+server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        const altPort = Number(PORT) + 1;
+        console.log(`Port ${PORT} is busy, switching to http://localhost:${altPort}`);
+        app.listen(altPort);
+    } else {
+        console.error(err);
+    }
 });
