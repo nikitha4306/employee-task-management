@@ -7,18 +7,32 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadEmployees() {
+    const select = document.getElementById('taskEmployee');
+    const defaultEmployees = [
+        { id: 1, name: 'Rahul Sharma' },
+        { id: 2, name: 'Priya Patel' },
+        { id: 3, name: 'Amit Verma' },
+        { id: 4, name: 'Sneha Gupta' },
+        { id: 5, name: 'Vikram Malhotra' }
+    ];
+
     try {
         const response = await fetch(`${API_URL}/employees`);
-        const employees = await response.json();
+        let employees = await response.json();
         
-        const select = document.getElementById('taskEmployee');
+        if (!Array.isArray(employees) || employees.length === 0) {
+            employees = defaultEmployees;
+        }
+
         select.innerHTML = '<option value="">-- Select Employee --</option>';
-        
         employees.forEach(emp => {
             select.innerHTML += `<option value="${emp.id}">${emp.name}</option>`;
         });
     } catch (err) {
-        console.error('Failed to load employees:', err);
+        select.innerHTML = '<option value="">-- Select Employee --</option>';
+        defaultEmployees.forEach(emp => {
+            select.innerHTML += `<option value="${emp.id}">${emp.name}</option>`;
+        });
     }
 }
 

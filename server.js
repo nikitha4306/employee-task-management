@@ -5,7 +5,7 @@ const path = require('path');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const INITIAL_PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -40,10 +40,68 @@ let sampleTasks = [
 
 async function connectDatabase() {
     try {
+        const rootConnection = await mysql.createConnection({
+            host: dbConfig.host,
+            user: dbConfig.user,
+            password: dbConfig.password,
+            port: dbConfig.port
+        });
+        await rootConnection.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\`;`);
+        await rootConnection.end();
+
         dbPool = mysql.createPool(dbConfig);
-        await dbPool.query('SELECT 1');
+
+        await dbPool.query(`
+            CREATE TABLE IF NOT EXISTS employees (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                email VARCHAR(100) NOT NULL,
+                department VARCHAR(100) NOT NULL
+            );
+        `);
+
+        await dbPool.query(`
+            CREATE TABLE IF NOT EXISTS tasks (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(200) NOT NULL,
+                description TEXT,
+                priority ENUM('Low', 'Medium', 'High') DEFAULT 'Medium',
+                status ENUM('Pending', 'In Progress', 'Completed') DEFAULT 'Pending',
+                assigned_employee_id INT,
+                due_date DATE NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (assigned_employee_id) REFERENCES employees(id) ON DELETE SET NULL
+            );
+        `);
+
+        const [empRows] = await dbPool.query('SELECT COUNT(*) as count FROM employees');
+        if (empRows[0].count === 0) {
+            await dbPool.query(`
+                INSERT INTO employees (id, name, email, department) VALUES
+                (1, 'Rahul Sharma', 'rahul@company.com', 'Engineering'),
+                (2, 'Priya Patel', 'priya@company.com', 'Design'),
+                (3, 'Amit Verma', 'amit@company.com', 'Backend'),
+                (4, 'Sneha Gupta', 'sneha@company.com', 'Testing'),
+                (5, 'Vikram Malhotra', 'vikram@company.com', 'Marketing');
+            `);
+        }
+
+        const [taskRows] = await dbPool.query('SELECT COUNT(*) as count FROM tasks');
+        if (taskRows[0].count === 0) {
+            await dbPool.query(`
+                INSERT INTO tasks (id, title, description, priority, status, assigned_employee_id, due_date) VALUES
+                (1, 'Redesign Mobile App Onboarding Flow', 'Improve user retention by simplifying the signup screen and adding interactive feature tooltips.', 'High', 'In Progress', 2, '2026-10-15'),
+                (2, 'Optimize Database Indexing for Order Queries', 'Add composite indexes on customer order tables to reduce query latency during peak traffic hours.', 'High', 'Pending', 3, '2026-10-18'),
+                (3, 'Prepare Q4 Marketing Campaign Plan', 'Draft target audience persona sheets, social media schedule, and budget breakdown for Q4 product launch.', 'Medium', 'Pending', 5, '2026-10-25'),
+                (4, 'Execute Regression Test Suite for v2.4 Release', 'Perform manual end-to-end testing on checkout workflow, payment gateway integration, and email triggers.', 'Medium', 'In Progress', 4, '2026-10-12'),
+                (5, 'Update Security Certificates & SSL Config', 'Renew production domain SSL certificates and update server security protocols before expiry.', 'Low', 'Completed', 1, '2026-10-05');
+            `);
+        }
+
         useFallbackData = false;
+        console.log('✅ MySQL Database connected & initialized!');
     } catch (err) {
+        console.log('⚡ Running in fallback mode with sample data.');
         useFallbackData = true;
     }
 }
@@ -54,9 +112,12 @@ app.get('/api/employees', async (req, res) => {
     }
     try {
         const [rows] = await dbPool.query('SELECT id, name FROM employees ORDER BY name ASC');
+        if (!rows || rows.length === 0) {
+            return res.json(sampleEmployees);
+        }
         res.json(rows);
     } catch (err) {
-        res.status(500).json({ error: 'Failed to load employees' });
+        res.json(sampleEmployees);
     }
 });
 
@@ -191,17 +252,18 @@ app.delete('/api/tasks/:id', async (req, res) => {
     }
 });
 
-const server = app.listen(PORT, async () => {
-    await connectDatabase();
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+function startServer(portToTry) {
+    const srv = app.listen(portToTry, async () => {
+        await connectDatabase();
+        console.log(`Server running on http://localhost:${srv.address().port}`);
+    });
+    srv.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            startServer(portToTry + 1);
+        } else {
+            console.error(err);
+        }
+    });
+}
 
-server.on('error', (err) => {
-    if (err.code === 'EADDRINUSE') {
-        const altPort = Number(PORT) + 1;
-        console.log(`Port ${PORT} is busy, switching to http://localhost:${altPort}`);
-        app.listen(altPort);
-    } else {
-        console.error(err);
-    }
-});
+startServer(Number(INITIAL_PORT));
